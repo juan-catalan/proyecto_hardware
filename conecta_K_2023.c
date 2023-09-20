@@ -111,16 +111,13 @@ int conecta_K_verificar_K_en_linea(TABLERO *t, uint8_t fila, uint8_t columna, ui
 	return resultado_c_c;
 }
 
-TABLERO cuadricula;
-static uint8_t salida[8][8];
 
 void conecta_K_jugar(void){
 	// new, row, column, colour, padding to prevent desalinating to 8 bytes
 	static volatile uint8_t entrada[8] = {0, 0, 0, 0, 0, 0, 0, 0 }; //jugada, fila, columna, color, ...
 	// 8x8 intentando que este alineada para que se vea bien en memoria
-//static uint8_t salida[8][8];
-	
-//	TABLERO cuadricula;
+	static uint8_t salida[8][8];
+	TABLERO cuadricula;
 
 	uint8_t row, column, colour;
 
