@@ -10,8 +10,8 @@ conecta_K_hay_linea_c_arm
 	; STMDB de los registros necesarios, fp y lr. 
 	; suponer empezar desde registro r4 -> r0 = t, r1 = fila, r2 = columna???
 	mov r4, #4								; r4 = N_DELTAS
-	mov r5, deltas_fila 					; r5 = vector deltas_fila
-	mov r6, deltas_columna 					; r6 = vector deltas_columna
+	ldr r5, =deltas_fila 					; r5 = vector deltas_fila
+	ldr r6, =deltas_columna 				; r6 = vector deltas_columna
 	mov r7, #0 								; r7 = i = 0
 	mov r8, #0 								; r8 = linea = 0(FALSE) 
 	mov r9, #0								; r9 = long_linea = 0
@@ -28,7 +28,7 @@ ini_buc
 	; push registros t, fila, columna
 	push {r10, r11}							; push de delta_fila[i] y delta_columna[i]
 	bl conecta_K_buscar_alineamiento_c		; llamada a conecta_K_buscar_alineamiento_c(t, fila, col, del_fila[i], del_col[i])
-	pop {r10, r11}							' recuperamos los registros
+	pop {r10, r11}							; recuperamos los registros
 	; pop registros t, fila, columna
 	; mov r9, r? - registro en el que se guarde long_linea
 	ldr r12, =K_SIZE						; creo que no puedo <-----------------
