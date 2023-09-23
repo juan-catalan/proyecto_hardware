@@ -41,19 +41,21 @@ ini_buc
 	movge r7, #1							; entonces linea = TRUE
 	bge fin_bucle							; sale del bucle (continue)
 	; si linea = FALSE
+	push {r0-r2, r12}
 	sub r1, r1, r9							; fila - deltas_fila[i]
 	and r1, r1, #0xFF						; aplicamos mascara						
 	sub r2, r2, r10							; columna - deltas_columna[i]
 	and r2, r2, #0xFF						; aplicamos mascara
 	mov r12, #0								; r12 = 0 (SE HA CHAFADO K_SIZE)
 	sub r9, r12, r9							; -deltas_fila[i]
+	and r9, r9, #0XFF						; aplicamos máscara
 	sub r10, r12, r10						; -deltas_columna[i]
-	push {r0-r3}							; push de los registros scratch
+	and r10, r10, #0xFF						; aplicamos máscara
 	push {r9-r10}							; push de -deltas_fila[i] y deltas_columna[i]
 	bl conecta_K_buscar_alineamiento_c		; llamada a conecta_K_buscar_alineamiento_c(t, fila-del_fila[i], col-del_col[i], -del_fila[i], -del_col[i])
 	add r8, r8, r0							; long_linea += ...
 	pop {r9-r10}							; recuperamos los registros
-	pop {r0-r3}								; recuperamos los registros scratch
+	pop {r0-r2, r12}						; recuperamos los registros
 	ldr r12, =K_SIZE						; r12 = K_SIZE
 	cmp r8, r12								; si long_linea >= K_SIZE
 	movge r7, #1							; entonces linea = TRUE
@@ -61,9 +63,8 @@ ini_buc
 	b ini_buc
 fin_bucle
 	mov r0, r7								; return linea
-	LDMDB FP, {r4-r10, FP, SP, PC}
+	LDMIA SP!, {r4-r10, FP, PC}
 	END
-	
 	
 	
 	
