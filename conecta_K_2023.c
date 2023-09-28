@@ -1,5 +1,6 @@
 #include "conecta_K_2023.h"
 #include "entrada.h"
+#include "tablero_test.h"
 
 // devuelve la longitud de la línea más larga en un determinado sentido
 uint8_t conecta_K_buscar_alineamiento_c(TABLERO *t, uint8_t fila,
@@ -50,9 +51,8 @@ conecta_K_hay_linea_c_c(TABLERO *t, uint8_t fila, uint8_t columna, uint8_t color
 // a la estructura de datos tablero para facilitar el test de posibles jugadas
 //
 // 0: casilla vacia, 1:ficha jugador uno, 2: ficha jugador dos
-void conecta_K_test_cargar_tablero(TABLERO *t)
+void conecta_K_test_cargar_tablero(TABLERO *t, uint8_t tablero_test[7][7])
 {
-	#include "tablero_test.h"	
 	CELDA celda_insertar;
 	for (int f=0; f<7; f++){
 		for (int c=0; c<7; c++){
@@ -119,8 +119,46 @@ int conecta_K_verificar_K_en_linea(TABLERO *t, uint8_t fila, uint8_t columna, ui
 	return resultado_c_c;
 }
 
+void probar_jugadas() {
+	TABLERO cuadricula;
+	#include "jugadas_test.h"
+	uint8_t row, column;
+	static uint8_t salida[8][8];
+	// Para cada color
+	for (int colour = 1; colour!=2; colour++){
+		for (int i = 0; i < NUM_JUGADAS; i++){
+			tablero_inicializar(&cuadricula);
+			if (colour == 1){
+				conecta_K_test_cargar_tablero(&cuadricula, tablero_test_jugadas_1s);
+			}
+			else {
+				conecta_K_test_cargar_tablero(&cuadricula, tablero_test_jugadas_2s);
+			}
+			
+			row = jugada[i][0];
+			column = jugada[i][1];
+			// 
+			if(tablero_fila_valida(row) && tablero_columna_valida(column) && tablero_color_valido(colour)){	
+				//podriamos no validarla ya que tablero_insertar_valor vuelve a validar
+				if (celda_vacia(tablero_leer_celda(&cuadricula, row, column))){
+					//tablero_insertar tambien chequea si esta libre esa celda o no...
+					if(tablero_insertar_color(&cuadricula, row, column, colour) == EXITO) {
+						conecta_K_visualizar_tablero(&cuadricula, salida);
+						int resultado = conecta_K_verificar_K_en_linea(&cuadricula, row, column, colour);
+					}
+					else {
+						while(1); //no cabe en la matriz dispersa, hemos dimensionado mal, error de diseño
+					}
+				}
+			}
+		}
+	}
+}
+
 
 void conecta_K_jugar(void){
+	probar_jugadas();
+	
 	// new, row, column, colour, padding to prevent desalinating to 8 bytes
 	static volatile uint8_t entrada[8] = {0, 0, 0, 0, 0, 0, 0, 0 }; //jugada, fila, columna, color, ...
 	// 8x8 intentando que este alineada para que se vea bien en memoria
@@ -131,7 +169,7 @@ void conecta_K_jugar(void){
 
 	tablero_inicializar(&cuadricula);
 
-	conecta_K_test_cargar_tablero(&cuadricula);
+	conecta_K_test_cargar_tablero(&cuadricula, tablero_test);
 	conecta_K_visualizar_tablero(&cuadricula, salida);
 
 	entrada_inicializar(entrada);
