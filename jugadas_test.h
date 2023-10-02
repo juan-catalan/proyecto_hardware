@@ -5,15 +5,20 @@
 //tableros de test
 // 0: celda vacia, 1: ficha jugador uno, 2: ficha jugador dos
 
-const int NUM_JUGADAS = 10;
+const int NUM_JUGADAS = 16;
 static uint8_t jugada[NUM_JUGADAS][2] = 
 {
-	//Jugada probando ficha blanca (1) linea diagonal (x, -y)
 	1, 1,
 	1, 2,
 	1, 3,
 	1, 4,
 	1, 5,
+	2, 1,
+	2, 5,
+	3, 1,
+	3, 5,
+	4, 1,
+	4, 5,
 	5, 1,
 	5, 2,
 	5, 3,

@@ -19,7 +19,7 @@ tablero_test[7][7] =
 // se pueden definir otros tableros para comprobar casos
 
 static uint8_t
-tablero_test_jugadas_1s[7][7] =
+tablero_test_jugadas_1s_extremo[7][7] =
 {
 0, 0, 0, 0, 0, 0, 0,
 0, 0, 0, 0, 0, 0, 0,
@@ -30,7 +30,7 @@ tablero_test_jugadas_1s[7][7] =
 0, 0, 0, 0, 0, 0, 0};
 
 static uint8_t
-tablero_test_jugadas_2s[7][7] =
+tablero_test_jugadas_2s_extremo[7][7] =
 {
 0, 0, 0, 0, 0, 0, 0,
 0, 0, 0, 0, 0, 0, 0,
@@ -39,5 +39,27 @@ tablero_test_jugadas_2s[7][7] =
 0, 0, 2, 2, 2, 0, 0,
 0, 0, 0, 0, 0, 0, 0, 
 0, 0, 0, 0, 0, 0, 0};
+
+static uint8_t
+tablero_test_jugadas_1s_medio[7][7] =
+{
+1, 0, 1, 0, 0, 1, 0,
+0, 0, 0, 0, 0, 0, 0,
+1, 0, 1, 1, 0, 0, 0, 
+0, 0, 1, 1, 0, 0, 0, 
+0, 0, 0, 1, 0, 0, 0,
+1, 0, 0, 0, 0, 0, 0,
+0, 0, 0, 1, 0, 1, 0};
+
+static uint8_t
+tablero_test_jugadas_2s_medio[7][7] =
+{
+2, 0, 2, 0, 0, 2, 0,
+0, 0, 0, 0, 0, 0, 0,
+2, 0, 2, 2, 0, 0, 0, 
+0, 0, 2, 2, 0, 0, 0, 
+0, 0, 0, 2, 0, 0, 0,
+2, 0, 0, 0, 0, 0, 0,
+0, 0, 0, 2, 0, 2, 0};
 
 #endif

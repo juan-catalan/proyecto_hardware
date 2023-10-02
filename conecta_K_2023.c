@@ -102,7 +102,10 @@ void conecta_K_visualizar_tablero(TABLERO *t, uint8_t pantalla[8][8])
 		
 }  
 
-//
+// funcion que dado un tablero, una fila, una columna y un color
+// comprueba si colocar una ficha de ese color en la fila y columna especificada
+// produce una linea y por lo tanto la partida ha terminado
+// Ademas verifica que las distintas versionas de conecta_K_hay_linea funcionan correctamente
 int conecta_K_verificar_K_en_linea(TABLERO *t, uint8_t fila, uint8_t columna, uint8_t color){
 	// en esta funcion es donde se debe verificar que todas las optimizaciones dan el mismo resultado
 	uint8_t resultado_c_c = conecta_K_hay_linea_c_c(t, fila, columna, color);
@@ -119,37 +122,51 @@ int conecta_K_verificar_K_en_linea(TABLERO *t, uint8_t fila, uint8_t columna, ui
 	return resultado_c_c;
 }
 
-void probar_jugadas() {
+// funcion auxiliar para testing que imita las comprobaciones y acciones que se realizan cuando
+// un usuario quiere añadir una ficha
+void verificar_jugada(TABLERO *t,uint8_t row, uint8_t column, uint8_t colour){
+	if(tablero_fila_valida(row) && tablero_columna_valida(column) && tablero_color_valido(colour)){	
+		//podriamos no validarla ya que tablero_insertar_valor vuelve a validar
+		if (celda_vacia(tablero_leer_celda(t, row, column))){
+			//tablero_insertar tambien chequea si esta libre esa celda o no...
+			if(tablero_insertar_color(t, row, column, colour) == EXITO) {
+				int resultado = conecta_K_verificar_K_en_linea(t, row, column, colour);
+			}
+			else {
+				while(1); //no cabe en la matriz dispersa, hemos dimensionado mal, error de diseño
+			}
+		}
+	}
+}
+
+// funcion que realiza un conjunto de jugadas de test sobre los diferentes tableros de test
+void test_jugadas() {
 	TABLERO cuadricula;
 	#include "jugadas_test.h"
 	uint8_t row, column;
-	static uint8_t salida[8][8];
 	// Para cada color
-	for (int colour = 1; colour!=2; colour++){
+	for (uint8_t colour = 1; colour<=2; colour++){
+		// Ejecutamos cada jugada
 		for (int i = 0; i < NUM_JUGADAS; i++){
-			tablero_inicializar(&cuadricula);
-			if (colour == 1){
-				conecta_K_test_cargar_tablero(&cuadricula, tablero_test_jugadas_1s);
-			}
-			else {
-				conecta_K_test_cargar_tablero(&cuadricula, tablero_test_jugadas_2s);
-			}
-			
-			row = jugada[i][0];
-			column = jugada[i][1];
-			// 
-			if(tablero_fila_valida(row) && tablero_columna_valida(column) && tablero_color_valido(colour)){	
-				//podriamos no validarla ya que tablero_insertar_valor vuelve a validar
-				if (celda_vacia(tablero_leer_celda(&cuadricula, row, column))){
-					//tablero_insertar tambien chequea si esta libre esa celda o no...
-					if(tablero_insertar_color(&cuadricula, row, column, colour) == EXITO) {
-						conecta_K_visualizar_tablero(&cuadricula, salida);
-						int resultado = conecta_K_verificar_K_en_linea(&cuadricula, row, column, colour);
-					}
-					else {
-						while(1); //no cabe en la matriz dispersa, hemos dimensionado mal, error de diseño
-					}
+			// Para cada uno de los tableros
+			for (int j = 0; j < 4; j++){
+				tablero_inicializar(&cuadricula);
+				if (j == 0){
+					conecta_K_test_cargar_tablero(&cuadricula, tablero_test_jugadas_1s_extremo);
 				}
+				else if (j == 1){
+					conecta_K_test_cargar_tablero(&cuadricula, tablero_test_jugadas_2s_extremo);
+				}
+				else if (j == 2){
+					conecta_K_test_cargar_tablero(&cuadricula, tablero_test_jugadas_1s_medio);
+				}
+				else {
+					conecta_K_test_cargar_tablero(&cuadricula, tablero_test_jugadas_2s_medio);
+				}
+				
+				row = jugada[i][0];
+				column = jugada[i][1];
+				verificar_jugada(&cuadricula, row, column, colour);
 			}
 		}
 	}
@@ -157,8 +174,7 @@ void probar_jugadas() {
 
 
 void conecta_K_jugar(void){
-	probar_jugadas();
-	
+	test_jugadas();
 	// new, row, column, colour, padding to prevent desalinating to 8 bytes
 	static volatile uint8_t entrada[8] = {0, 0, 0, 0, 0, 0, 0, 0 }; //jugada, fila, columna, color, ...
 	// 8x8 intentando que este alineada para que se vea bien en memoria
