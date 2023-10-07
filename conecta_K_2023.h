@@ -29,6 +29,10 @@ uint8_t conecta_K_hay_linea_arm_c(TABLERO *t, uint8_t fila, uint8_t columna, uin
 // devuelve true si encuentra una línea de longitud mayor o igual a K
 uint8_t conecta_K_hay_linea_arm_arm(TABLERO *t, uint8_t fila, uint8_t
 	columna, uint8_t color);
+	
+// devuelve true si encuentra una línea de longitud mayor o igual a K
+uint8_t conecta_K_hay_linea_arm_arm_rec(TABLERO *t, uint8_t fila, uint8_t
+	columna, uint8_t color);
 
 /* *****************************************************************************
  * declaración funciones internas conecta_K

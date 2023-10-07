@@ -14,10 +14,10 @@ K_SIZE EQU 4
 N_DELTAS EQU 4
 
 	AREA codigo, CODE
-	EXPORT conecta_K_hay_linea_arm_arm
+	EXPORT conecta_K_hay_linea_arm_arm_rec
 	PRESERVE8 {TRUE}
 	
-conecta_K_hay_linea_arm_arm
+conecta_K_hay_linea_arm_arm_rec
 	; r0 = t, r1 = fila, r2 = columna r3= color
 	STMDB SP!, {r4-r10, FP, LR}
 	LDR r4, =deltas_fila 					; r4 = vector deltas_fila
@@ -66,7 +66,8 @@ fin_bucle
 conecta_K_buscar_alineamiento_arm
 	; prologo
 	STMDB SP!, {r4-r10,LR}
-	MOV r12, #0
+	; r12: registro acumulador del resultado
+	mov r12, #0
 	; calculo la posicion de t- > no_ceros
 	ADD r6, r0, #COLUMNAS_SIZE
 
@@ -81,7 +82,7 @@ ini_buc_buscar_alineamiento
 	mov r8, #0 ; r8: col
 	; calculo la direccion de columnas[fila]
 	MOV r4, #MAX_NO_CERO
-	MLA r4, r1, r4, r0 ; r4 : direccion t->columnas[fila] (cada fila ocupa MAX_NO_CERO bytes)
+	MLA r4, r1, r4, r0 ; r9 : direccion t->columnas[fila] (cada fila ocupa MAX_NO_CERO bytes)
 	
 buscar_columna			; while (pueda seguir buscando)
 	; compruebo que no estemos buscando en una columna >= MAX_NO_CERO
@@ -102,15 +103,14 @@ columna_encontrada
 	LDRB r4, [r7, r8] ; r9: t->no_ceros[fila][col]
 	AND r4, r4, #0X3; aplico una mascara a r9 para eliminar el bit de ocupado de la celda
 	CMP r4, r3 ; if (tablero_buscar_color != 0)
-	BEQ color_encontrado
-	B fin
+	BNE fin
 		
 	
 color_encontrado	
 	ADD r1, r1, r9 ; nueva_fila = fila + delta_fila
 	ADD r2, r2, r10 ; nueva_columna = columna + delta_columna
-	BL conecta_K_buscar_alineamiento_arm
-	ADD r12, r12, #1 ; aumento el resultado
+	ADD r12, r12, #1 ; acumulo el resultado
+	B ini_buc_buscar_alineamiento
 	
 ; epilogo
 fin

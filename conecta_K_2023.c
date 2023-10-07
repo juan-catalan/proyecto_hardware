@@ -47,6 +47,33 @@ conecta_K_hay_linea_c_c(TABLERO *t, uint8_t fila, uint8_t columna, uint8_t color
    return linea;
 }
 
+// devuelve true si encuentra una línea de longitud mayor o igual a _K
+uint8_t
+conecta_K_hay_linea_c_arm(TABLERO *t, uint8_t fila, uint8_t columna, uint8_t color)
+{
+	 enum { N_DELTAS = 4};
+   int8_t deltas_fila[N_DELTAS] = {0, -1, -1, 1};
+   int8_t deltas_columna[N_DELTAS] = {-1, 0, -1, -1};
+   unsigned int i = 0;
+   uint8_t linea = FALSE;
+   uint8_t long_linea = 0;
+
+   // buscar linea en fila, columna y 2 diagonales
+   for(i=0; (i < N_DELTAS) && (linea == FALSE); ++i) {
+       // buscar sentido
+       long_linea = conecta_K_buscar_alineamiento_arm(t, fila, columna, color, deltas_fila[i], deltas_columna[i]);
+       linea = long_linea >= K_SIZE;
+       if (linea) {
+         continue;
+       }
+       // buscar sentido inverso
+       long_linea += conecta_K_buscar_alineamiento_arm(t, fila-deltas_fila[i],
+	       columna-deltas_columna[i], color, -deltas_fila[i], -deltas_columna[i]);
+       linea = long_linea >= K_SIZE;
+   }
+   return linea;
+}
+
 // carga el estado a mitad de partida de las primeras 7 filas y columnas 
 // a la estructura de datos tablero para facilitar el test de posibles jugadas
 //
@@ -109,14 +136,24 @@ void conecta_K_visualizar_tablero(TABLERO *t, uint8_t pantalla[8][8])
 int conecta_K_verificar_K_en_linea(TABLERO *t, uint8_t fila, uint8_t columna, uint8_t color){
 	// en esta funcion es donde se debe verificar que todas las optimizaciones dan el mismo resultado
 	uint8_t resultado_c_c = conecta_K_hay_linea_c_c(t, fila, columna, color);
-	//uint8_t resultado_arm_c = conecta_K_hay_linea_arm_c(t, fila, columna, color);
+	uint8_t resultado_arm_c = conecta_K_hay_linea_arm_c(t, fila, columna, color);
+	uint8_t resultado_c_arm = conecta_K_hay_linea_c_arm(t, fila, columna, color);
 	uint8_t resultado_arm_arm = conecta_K_hay_linea_arm_arm(t, fila, columna, color);
-	/*
+	uint8_t resultado_arm_arm_rec = conecta_K_hay_linea_arm_arm_rec(t, fila, columna, color);
+	
 	if(resultado_c_c != resultado_arm_c){
 		while(1){}
 	}
-	*/
+	
+	if(resultado_c_c != resultado_c_arm){
+		while(1){}
+	}
+	
 	if(resultado_c_c != resultado_arm_arm){
+		while(1){}
+	}
+	
+	if(resultado_c_c != resultado_arm_arm_rec){
 		while(1){}
 	}
 	return resultado_c_c;
@@ -174,7 +211,7 @@ void test_jugadas() {
 
 
 void conecta_K_jugar(void){
-	test_jugadas();
+	//test_jugadas();
 	// new, row, column, colour, padding to prevent desalinating to 8 bytes
 	static volatile uint8_t entrada[8] = {0, 0, 0, 0, 0, 0, 0, 0 }; //jugada, fila, columna, color, ...
 	// 8x8 intentando que este alineada para que se vea bien en memoria
